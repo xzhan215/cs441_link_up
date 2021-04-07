@@ -25,6 +25,7 @@ public class game extends AppCompatActivity {
     //the array stores black kind information
     private String[] pics = {"apple", "grape", "banana", "kiwi", "melon", "blueberry", "watermelon", "durian"};
     private ImageButton[][] board_but = new ImageButton[4][4];
+    private ImageButton restart_but;
     private TextView score_board;
     private int score = 0;
     private int start_r = 0, start_c = 0, des_r = 0, des_c = 0, num_clicked = 0;
@@ -109,7 +110,7 @@ public class game extends AppCompatActivity {
             board_search[i][0] = 0;
             board_search[i][5] = 0;
             board_search[0][i] = 0;
-            board_search[0][5] = 0;
+            board_search[5][i] = 0;
         }
     }
 
@@ -120,7 +121,7 @@ public class game extends AppCompatActivity {
         num_clicked = 1-num_clicked;
         //record the start but and destination but
         int but_id = view.getId();
-        view.setBackgroundColor(Color.argb(0, 185, 185, 185));
+        view.setAlpha((float) 0.5);
         for(int i = 0; i < 4; i++) {
             for(int j = 0; j < 4; j++) {
                 if(board_but[i][j].getId() == but_id) {
@@ -138,41 +139,67 @@ public class game extends AppCompatActivity {
 
         //after selected two buttons
         if(!isStart){
-            if((board[start_r][start_c] == board[des_r][des_c]) && find_path()) {
+            if(!(start_r == des_r && start_c == des_c) && (board[start_r][start_c] == board[des_r][des_c]) && find_path()) {
                 score ++;
                 board_but[start_r][start_c].setVisibility(View.INVISIBLE);
                 board_but[des_r][des_c].setVisibility(View.INVISIBLE);
                 board_search[start_r+1][start_c+1] = 0;
                 board_search[des_r+1][des_c+1] = 0;
             }else{
-                if(score > 0 ) score--;
+                score--;
             }
+            board_but[start_r][start_c].setAlpha((float) 1.0);
+            board_but[des_r][des_c].setAlpha((float) 1.0);
             score_board.setText(Integer.toString(score));
         }
     }
 
     public boolean empty_row_between(int row, int sc, int dc){
-        if(sc+1 == dc) return true;
-        for(int i = sc+1; i <= dc-1; i++){
-            if(board_search[row][i] != 0) return false;
+        int small, big;
+        if(sc <= dc){
+            small = sc;
+            big = dc;
+        }else{
+            small = dc;
+            big = sc;
+        }
+        if(small+1 == big) return true;
+        for(int i = small+1; i <= big-1; i++){
+            if(board_search[row][i] == 1) return false;
         }
         return true;
     }
 
     public boolean empty_col_between(int col, int sr, int dr){
-        if(sr+1 == dr) return true;
-        for(int i = sr+1; i <= dr-1; i++){
-            if(board_search[i][col] != 0) return false;
+        int small, big;
+        if(sr <= dr){
+            small = sr;
+            big = dr;
+        }else{
+            small = dr;
+            big = sr;
+        }
+        if(small+1 == big) return true;
+        for(int i = small+1; i <= big-1; i++){
+            if(board_search[i][col] == 1) return false;
         }
         return true;
     }
 
     public Vector<Integer> find_empty_row(int sc, int dc){
+        int small, big;
+        if(sc <= dc){
+            small = sc;
+            big = dc;
+        }else{
+            small = dc;
+            big = sc;
+        }
         Vector<Integer> rows = new Vector<>();
         for(int i = 0; i < 6; i++){
             boolean isEmpty = true;
-            for(int j = sc; j <= dc; j++){
-                if(board_search[i][j] != 0){
+            for(int j = small; j <= big; j++){
+                if(board_search[i][j] == 1){
                     isEmpty = false;
                     break;
                 }
@@ -183,36 +210,35 @@ public class game extends AppCompatActivity {
     }
 
     public Vector<Integer> find_empty_col(int sr, int dr){
+        int small, big;
+        if(sr <= dr){
+            small = sr;
+            big = dr;
+        }else{
+            small = dr;
+            big = sr;
+        }
         Vector<Integer> cols = new Vector<>();
         for(int i = 0; i < 6; i++){
             boolean isEmpty = true;
-            for(int j = sr; j <= dr; j++){
-                if(board_search[j][i] != 0){
+            for(int j = small; j <= big; j++){
+                if(board_search[j][i] == 1){
                     isEmpty = false;
                     break;
                 }
             }
             if(isEmpty) cols.add(i);
+
         }
         return cols;
     }
 
     public boolean find_path() {
         int beginC, endC, beginR, endR;
-        if(start_r <= des_r){
-            beginR = start_r+1;
-            endR = des_r+1;
-        }else{
-            beginR = des_r+1;
-            endR =start_r+1;
-        }
-        if(start_c <= des_c){
-            beginC = start_c+1;
-            endC = des_c+1;
-        }else{
-            beginC = des_c+1;
-            endC =start_c+1;
-        }
+        beginC = start_c+1;
+        beginR = start_r+1;
+        endC = des_c+1;
+        endR = des_r+1;
 
         //no turns
         if(beginR == endR){
@@ -222,8 +248,8 @@ public class game extends AppCompatActivity {
         }
 
         //one turns
-        if(empty_row_between(beginR, beginC, endC) && empty_col_between(endC, beginR, endR)) return true;
-        else if(empty_row_between(endR, beginC, endC) && empty_col_between(beginC, beginR, endR)) return true;
+        if(empty_row_between(beginR, beginC, endC) && empty_col_between(endC, beginR, endR) && board_search[beginR][endC] != 1) return true;
+        else if(empty_row_between(endR, beginC, endC) && empty_col_between(beginC, beginR, endR) && board_search[endR][beginC] != 1) return true;
 
         //two turns
         Vector<Integer> empty_rows = find_empty_row(beginC, endC);
@@ -231,19 +257,16 @@ public class game extends AppCompatActivity {
         if(empty_rows.size() != 0){
             for(int r : empty_rows){
                 boolean findcol1, findcol2;
-                if(r < beginR) findcol1 = empty_col_between(beginC, r, beginR);
-                else findcol1 = empty_col_between(beginC, beginR, r);
-                if(r < endR) findcol2 = empty_col_between(endC, r, endR);
-                else findcol2 = empty_col_between(endC, endR, r);
+                findcol1 = empty_col_between(beginC, r, beginR);
+                findcol2 = empty_col_between(endC, r, endR);
                 if(findcol1 && findcol2) return true;
             }
-        }else if(empty_cols.size() != 0){
+        }
+        if(empty_cols.size() != 0){
             for(int c : empty_cols){
                 boolean findrow1, findrow2;
-                if(c < beginC) findrow1 = empty_row_between(beginR, c, beginC);
-                else findrow1 = empty_row_between(beginR, beginC, c);
-                if(c < endC) findrow2 = empty_row_between(endR, c, endC);
-                else findrow2 = empty_row_between(endR, endC, c);
+                findrow1 = empty_row_between(beginR, c, beginC);
+                findrow2 = empty_row_between(endR, c, endC);
                 if(findrow1 && findrow2) return true;
             }
         }
