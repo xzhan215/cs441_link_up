@@ -88,6 +88,7 @@ public class game extends AppCompatActivity {
         //attach the image on the button with assigned image
         for(int i = 0; i < 4; i++) {
             for(int j = 0; j< 4; j++) {
+                board_but[i][j].setVisibility(View.VISIBLE);
                 String pic = board[i][j];
                 if(pic.equals("apple")) board_but[i][j].setImageResource(R.drawable.apple);
                 else if(pic.equals("grape")) board_but[i][j].setImageResource(R.drawable.grape);
@@ -273,6 +274,9 @@ public class game extends AppCompatActivity {
         return false;
     }
 
+    public void restart_game(View view) {
+        initializeboard();
+    }
 
     public void switch_to_menu(View view) {
         Intent act_action = new Intent(this, MainActivity.class);
