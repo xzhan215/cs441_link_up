@@ -58,7 +58,7 @@ public class game extends AppCompatActivity {
     public void initializeboard(){
         //reset the selected button
         start_r = 0; start_c = 0; des_r = 0; des_c = 0; num_clicked = 0;
-
+        score = 0;
         score_board.setText(Integer.toString(0));
         Vector<String> pics_copy = new Vector<>();
         Map<String, Integer> pics_temp = new HashMap<String, Integer>();

@@ -12,7 +12,6 @@
         android:layout_height="107dp"
         android:gravity="center"
         android:text="INSTRUCTION"
-
         android:textColor="@color/black"
         android:textSize="40dp"
         android:textStyle="bold"
@@ -41,6 +40,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="switch_to_menu"
+        android:backgroundTint="#FFF381"
+        android:textColor="@color/black"
+        android:textStyle="bold"
         android:text="Back to Menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
