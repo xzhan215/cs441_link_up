@@ -2,7 +2,9 @@ package com.example.lineup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -28,10 +30,12 @@ public class game extends AppCompatActivity {
     private ImageButton restart_but;
     private TextView score_board;
     private int score = 0;
+    private int highest_score = 0;
     private int start_r = 0, start_c = 0, des_r = 0, des_c = 0, num_clicked = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         score_board = (TextView) findViewById(R.id.score);
@@ -146,6 +150,9 @@ public class game extends AppCompatActivity {
                 board_but[des_r][des_c].setVisibility(View.INVISIBLE);
                 board_search[start_r+1][start_c+1] = 0;
                 board_search[des_r+1][des_c+1] = 0;
+                if(score > highest_score) {
+                    highest_score = score;
+                }
             }else{
                 score--;
             }
@@ -281,6 +288,19 @@ public class game extends AppCompatActivity {
     public void switch_to_menu(View view) {
         Intent act_action = new Intent(this, MainActivity.class);
         startActivity(act_action);
+    }
+
+    public void switch_to_leaderboard(View view){
+        // We need an Editor object to make preference changes.
+        // All objects are from android.context.Context
+        SharedPreferences settings = getSharedPreferences("myPref", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt("key", highest_score);
+        editor.apply();
+
+        Intent act_action = new Intent( this, board.class);
+        startActivity(act_action);
+        finish();
     }
 }
 
